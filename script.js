@@ -5,17 +5,12 @@ function setCookie(nome, valor, dias) {
     let data = new Date();
 
     // Define a data de expiração do cookie
-    // dias * horas * minutos * segundos * milissegundos
     data.setTime(data.getTime() + (dias * 24 * 60 * 60 * 1000));
 
     // Converte a data para o formato aceito pelos cookies
     let expires = "expires=" + data.toUTCString();
 
     // Cria o cookie
-    // nome = nome do cookie
-    // valor = valor armazenado
-    // expires = data de expiração
-    // path=/ = disponível em todo o site
     document.cookie = nome + "=" + valor + ";" + expires + ";path=/";
 }
 
@@ -23,87 +18,115 @@ function setCookie(nome, valor, dias) {
 // Função que busca um cookie pelo nome
 function getCookie(nome) {
 
-    // Monta a parte inicial que será procurada
+    // Nome do cookie que será procurado
     let nomeCookie = nome + "=";
 
-    // Divide todos os cookies em um vetor usando ";"
+    // Divide todos os cookies em um vetor
     let cookies = document.cookie.split(";");
 
-    // Percorre todos os cookies encontrados
+    // Percorre todos os cookies
     for (let i = 0; i < cookies.length; i++) {
 
-        // Remove espaços em branco antes e depois do texto
+        // Remove espaços em branco
         let c = cookies[i].trim();
 
-        // Verifica se o cookie atual começa com o nome procurado
-        if (c.indexOf(nomeCookie) == 0) {
+        // Verifica se encontrou o cookie procurado
+        if (c.indexOf(nomeCookie) === 0) {
 
-            // Retorna apenas o valor do cookie
-            return c.substring(nomeCookie.length, c.length);
+            // Retorna apenas o valor
+            return c.substring(nomeCookie.length);
         }
     }
 
-    // Caso o cookie não exista, retorna vazio
+    // Retorna vazio caso não encontre
     return "";
 }
 
 
-// Função chamada ao clicar no botão "Salvar Nome"
+// Função chamada ao clicar em "Salvar Cookie"
 function salvarCookie() {
 
-    // Obtém o valor digitado no campo de texto
+    // Obtém o valor digitado
     let nome = document.getElementById("nome").value;
 
     // Verifica se o campo não está vazio
     if (nome !== "") {
 
-        // Salva o nome em um cookie chamado "usuario"
-        // que ficará armazenado por 7 dias
+        // Salva o cookie por 7 dias
         setCookie("usuario", nome, 7);
 
-        // Atualiza a mensagem exibida na tela
+        // Atualiza a mensagem
         mostrarMensagem();
     }
 }
 
 
-// Função que exibe mensagens ao usuário
+// Mostra o conteúdo do cookie
 function mostrarMensagem() {
 
-    // Obtém o valor salvo no cookie "usuario"
+    // Obtém o valor salvo
     let usuario = getCookie("usuario");
 
-    // Seleciona o elemento <p> que mostrará a mensagem
+    // Seleciona o parágrafo de resultado
     let mensagem = document.getElementById("mensagem");
 
-    // Verifica se existe um usuário salvo
+    // Verifica se existe cookie
     if (usuario !== "") {
 
-        // Exibe mensagem personalizada
         mensagem.innerHTML =
-            "Olá, " + usuario + "! Seu nome foi salvo em cookie 🍪";
+            "Olá, " + usuario + "! Seu nome está salvo em um cookie 🍪";
 
     } else {
 
-        // Exibe mensagem caso não exista cookie
-        mensagem.innerHTML = "Nenhum cookie salvo.";
+        mensagem.innerHTML =
+            "Nenhum cookie foi encontrado.";
     }
 }
 
 
-// Função chamada ao clicar no botão "Remover Cookie"
+// Remove o cookie
 function removerCookie() {
 
-    // Cria o cookie com uma data antiga
-    // Isso faz o navegador apagá-lo automaticamente
+    // Define uma data antiga para excluir o cookie
     document.cookie =
         "usuario=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
 
-    // Atualiza a mensagem na tela
+    // Atualiza a mensagem
     mostrarMensagem();
 }
 
 
-// Executa a função assim que a página é carregada
-// para verificar se já existe um cookie salvo
-mostrarMensagem();
+// Alterna entre tema claro e escuro
+function alternarTema() {
+
+    // Adiciona ou remove a classe dark
+    document.body.classList.toggle("dark");
+
+    // Verifica qual tema está ativo
+    let tema = document.body.classList.contains("dark")
+        ? "escuro"
+        : "claro";
+
+    // Salva o tema em cookie por 30 dias
+    setCookie("tema", tema, 30);
+}
+
+
+// Aplica o tema salvo ao abrir a página
+function carregarTema() {
+
+    let tema = getCookie("tema");
+
+    if (tema === "escuro") {
+        document.body.classList.add("dark");
+    }
+}
+
+
+// Executa quando a página terminar de carregar
+window.onload = function () {
+
+    carregarTema();
+
+    mostrarMensagem();
+};
